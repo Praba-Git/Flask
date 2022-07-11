@@ -1,0 +1,361 @@
+<html>
+  <head>
+    <title>Ajax Table</title>
+    <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">   
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>     
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+    
+    <style>
+      body {
+        font-family: Sans-Serif;
+      }
+    </style>
+<style type="text/css">
+    body {
+        color: #404E67;
+        background: #F5F7FA;
+  font-family: 'Open Sans', sans-serif;
+ }
+ .table-wrapper {
+  width: 700px;
+  margin: 30px auto;
+        background: #fff;
+        padding: 20px; 
+        box-shadow: 0 1px 1px rgba(0,0,0,.05);
+    }
+    .table-title {
+        padding-bottom: 10px;
+        margin: 0 0 10px;
+    }
+    .table-title h2 {
+        margin: 6px 0 0;
+        font-size: 22px;
+    }
+    .table-title .add-new {
+        float: right;
+  height: 30px;
+  font-weight: bold;
+  font-size: 12px;
+  text-shadow: none;
+  min-width: 100px;
+  border-radius: 50px;
+  line-height: 13px;
+    }
+ .table-title .add-new i {
+  margin-right: 4px;
+ }
+    table.table {
+        table-layout: fixed;
+    }
+    table.table tr th, table.table tr td {
+        border-color: #e9e9e9;
+    }
+    table.table th i {
+        font-size: 13px;
+        margin: 0 5px;
+        cursor: pointer;
+    }
+    table.table th:last-child {
+        width: 100px;
+    }
+    table.table td a {
+  cursor: pointer;
+        display: inline-block;
+        margin: 0 5px;
+  min-width: 24px;
+    }   
+ table.table td a.add {
+        color: #27C46B;
+    }
+    table.table td a.edit {
+        color: #FFC107;
+    }
+    table.table td a.delete {
+        color: #E34724;
+    }
+    table.table td i {
+        font-size: 19px;
+    }
+ table.table td a.add i {
+        font-size: 24px;
+     margin-right: -1px;
+        position: relative;
+        top: 3px;
+    }    
+    table.table .form-control {
+        height: 32px;
+        line-height: 32px;
+        box-shadow: none;
+        border-radius: 2px;
+    }
+ table.table .form-control.error {
+  border-color: #f50000;
+ }
+ table.table td .add {
+  display: none;
+ }
+ .i {
+        font-size: 24px;
+     margin-right: -1px;
+        position: relative;
+        top: 3px;
+        border-color: #f50000;
+    } 
+.ui-widget-overlay.overlayStyle
+{
+    background: repeat-x scroll 50% 50% #ff0000;
+    opacity:0.3;
+    filter:Alpha(Opacity=15);
+}    
+.ui-dialog {
+    left:1%;
+    right:1%;
+}
+</style>
+<script type="text/javascript">
+        $(document).ready(function(){   
+           bootbox.confirm({ 
+                size: "small",
+                message: "Are you sure?",
+                callback: function(result){ return false; }
+            })
+        // dialog box
+        $("#dialog").dialog({
+        autoOpen : false, modal : true, show : "blind", hide : "blind" });    
+
+        $('[data-toggle="tooltip"]').tooltip();
+        var actions = $("table td:last-child").html();
+        // Append table with add row form on add new button click
+        $(".add-new").click(function(){
+            //alert($("table td:last-child"));
+            $(this).attr("disabled", "disabled");
+            var index = $("table tbody tr:last-child").index();
+            var row = '<tr>' +
+                '<td><input type="text" class="form-control" name="name" id="txtname"></td>' +
+                '<td><input type="text" class="form-control" name="position" id="txtposition"></td>' +
+              //  '<td><input type="text" class="form-control" name="office" id="txtoffice"></td>' +
+           // '<td>' + actions + '</td>' +
+              '<td><a class="add" title="Add" data-toggle="tooltip" id="add-new"><i class="fa fa-user-plus"></i></a></td>'
+            '</tr>';
+            $("table").append(row);  
+            $("table tbody tr").eq(index + 1).find(".add, .edit, .delete").toggle();
+            $('[data-toggle="tooltip"]').tooltip();
+      
+        });
+        
+        // Add row on add button click
+        $(document).on("click", ".add", function(){
+            var empty = false;
+            var input = $(this).parents("tr").find('input[type="text"]');
+            input.each(function(){
+                if(!$(this).val()){
+                    $(this).addClass("error");
+                    empty = true;
+                } else{
+                    $(this).removeClass("error");
+                }
+            });
+            var txtname = $("#txtname").val();
+            var txtposition = $("#txtposition").val();
+            //var txtoffice = $("#txtoffice").val();
+            $.post("/ajax_add", { txtname: txtname, txtposition: txtposition}, function(data) {
+                $("#displaymessage").html(data);
+                $("#displaymessage").show();
+            });
+            $(this).parents("tr").find(".error").first().focus();
+            if(!empty){
+                input.each(function(){
+                    $(this).parent("td").html($(this).val());
+                });   
+                $(this).parents("tr").find(".add, .edit, .delete").toggle();
+                $(".add-new").removeAttr("disabled");
+            } 
+        });
+        // Delete row on delete button click
+        $(document).on("click", ".delete", function(){
+           // $(this).parents("tr").remove();
+            $(".add-new").removeAttr("disabled");
+            var id = $(this).attr("id");
+            var string = id;     
+           // alert('test')      
+           // if (confirm('Are you sure you want to delete  ID: ' + string + '?'))
+            //delete confirmation
+            bootbox.confirm("Do you really want to delete record?", function(result)
+                {
+                   alert(result) // if(result){
+                    // // AJAX Request
+                    // $.ajax({
+                    //     url: 'ajaxfile.php',
+                    //     type: 'POST',
+                    //     data: { id:deleteid },
+                    //     success: function(response){
+
+                    //     // Removing row from HTML Table
+                    //   if(response == 1){
+                    // $(el).closest('tr').css('background','tomato');
+                    //         $(el).closest('tr').fadeOut(800,function(){
+                    //     $(this).remove();
+                    // });
+                    // }else{
+                    // bootbox.alert('Record not deleted.');
+                    // }
+
+                    //     }
+                    // });
+                    // }
+
+                })                            
+            // $( "#dialog-confirm" ).dialog({
+            //     title: 'Are you sure you want to delete  ID: ' + string + '?',
+            //     open: function(event, ui) {   // It'll hide Close button
+            //          $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();   
+            //          $('.ui-widget-overlay').addClass('overlayStyle');
+            //       },
+            //     //width: 300,
+            //     //height: 100,
+            //     modal: true,
+            //     resizable: false,
+            //     draggable: false,
+            //     buttons: [{
+            //     text: ' Yes ',
+            //     click: function(){
+            //         //delete it
+            //         //alert( $(".ui-widget-overlay").css);
+            //         }
+            //     },
+            //     {
+            //     text: ' No ',
+            //     click: function() {
+            //         $(this).dialog('close');
+            //         //alert('no');
+            //         }
+            //     }]
+            // })          
+            //alert(string)
+            // $.post("/ajax_delete", { string: string}, function(data) {
+            //     $("#displaymessage").html(data);
+            //     $("#displaymessage").show();
+            // });
+        });
+        // update rec row on edit button click
+        $(document).on("click", ".update", function(){
+            var id = $(this).attr("id");
+            var string = id;
+            var txtname = $("#txtname").val();
+            var txtposition = $("#txtposition").val();
+            //var txtoffice = $("#txtoffice").val();       
+            $.post("/ajax_update", { string: string,txtname: txtname, txtposition: txtposition}, function(data) {
+                $("#displaymessage").html(data);
+                $("#displaymessage").show();          
+            });                
+        });
+        // Edit row on edit button click
+        $(document).on("click", ".edit", function(){  
+            $(this).parents("tr").find("td:not(:last-child)").each(function(i){
+                if (i=='0'){
+                    var idname = 'txtname';
+                }else if (i=='1'){
+                    var idname = 'txtposition';
+                }else if (i=='2'){
+                   // var idname = 'txtoffice';
+                }else{} 
+                $(this).html('<input type="text" name="updaterec" id="' + idname + '" class="form-control" value="' + $(this).text() + '">');
+            });  
+            $(this).parents("tr").find(".add, .edit").toggle();
+            $(".add-new").attr("disabled", "disabled");
+            $(this).parents("tr").find(".add").removeClass("add").addClass("update"); 
+        });
+    });
+
+        // // delete confirmation modal dialog   
+        // $( function() {
+        //     $( "#dialog-confirm" ).dialog({
+        //     resizable: false,
+        //     height: "auto",
+        //     width: 400,
+        //     modal: true,
+        //     buttons: {
+        //         "Are you sure you want to delete  ID:": function() {
+        //         $( this ).dialog( "close" );
+        //         },
+        //         Cancel: function() {
+        //         $( this ).dialog( "close" );
+        //         }
+        //     }
+        //     });
+        // } );
+    </script>       
+  </head>
+  <body>
+    <div id="dialog-confirm" title="Delete this record ?" class="table table-bordered">       
+    </div>
+    <div  class="container">
+      <h1>Ajax Table</h1>
+      <hr>
+      <div class="table-title">
+        <div class="row">
+            <div class="col-sm-8"><h2>Employee <b>Details</b></h2></div>
+            <div class="col-sm-4">
+                <button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i> Add New</button>
+            </div>
+            <div class='btn btn-info' id="displaymessage" style="display:none;width:100%;margin-top:10px;"></div>
+        </div>
+      </div>
+      <div id="table"></div>      
+    </div>
+    <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+    <script type="module">       
+      new gridjs.Grid({
+        columns: [
+          { id: 'ID', name: 'ID' },
+          { id: 'Name', name: 'Name' },
+          { id: 'Acton', name: 'Action',             
+            formatter: (cell) =>{
+            return gridjs.html(`<a class='add' title='Add' data-toggle='tooltip' id="${cell}"><i class="fa fa-user-plus"></i></a>
+                                <a class='edit' title='Edit' data-toggle='tooltip' id="${cell}"><i class="fa fa-pencil"></i></a>
+                                <a class='delete' title='Delete' data-toggle='tooltip' id="${cell}"><i class="fa fa-trash-o"></i></a>`)}           
+          }                    
+        ],
+        server: {
+        url: '/gridjs',        
+        then: data => {
+                  console.log("data", data.data);
+                  return data.data.map(results => [results['ID'], results['Name'],results['ID']]);                  
+                } 
+                },
+        style: {
+                table: {
+                        border: '3px solid #ccc'
+                    },
+                th: {
+                        'background-color': 'grey',
+                        'color': '#000',
+                        'border-bottom': '3px solid #ccc',
+                        'text-align': 'center'
+                    },
+                td: {
+                        'text-align': 'center'
+                    }
+                },
+        className:{
+                    a: 'add',
+                    i: 'add',
+                    table: 'table table-bordered'
+                },                                
+        search: true,
+        sort: true,
+        pagination: true,
+      }).render(document.getElementById('table'));
+    </script>
+  </body>
+</html>
