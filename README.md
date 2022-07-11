@@ -1,6 +1,6 @@
-# Flask
+# US Weather Data Insights (UWDI)
 
-US Weather Data Insights (UWDI)
+
 
 US Weather Data Insights (UWDI) is a web application that will provide
 historical weather events which can be used to derive valuable weather insights. The
