@@ -186,12 +186,14 @@ $(document).ready(function(){
                     <div class="col-sm-8"><h2>Dallas Weather Data</h2></div>
                     <div class="col-sm-4">
                         <button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i> Add New</button>
+                        <a href="../weather_piechart">Data Insights</a>
                     </div>
                     <div class='btn btn-info' id="displaymessage" style="display:none;width:100%;margin-top:10px;"></div>
                 </div>
             </div>
             <table class="table table-bordered">
-                <thead>
+                
+                <thead>                    
                     <tr>
                         <th>Event ID</th>                        
                         <th>Type</th>
@@ -230,14 +232,25 @@ $(document).ready(function(){
         {{ pagination.links }}       
     </div>
     <!-- Sort/Search Gridjs implementation-->
-    <div class="table-title" >
+    <div class="table-title" ><p><h1 align="center">UWDI - Flask Application </h1></p>
+        <hr/>
         <div class="row">
-            <div class="col-sm-8"><h2>Employee <b>Details</b></h2></div>
+            <div class="col-sm-8"><h2>Dallas Weather Data</b></h2></div>        
             <div class="col-sm-4">
                 <button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i> Add New</button>
             </div>
             <div class='btn btn-info' id="displaymessage" style="display:none;width:100%;margin-top:10px;"></div>
-        </div>      
+        </div>
+        <table border="1" width="100%">
+            <tr><td></td></tr>
+            <tr>
+                <td align="right">  
+                    <a href="../weather_piechart">Data Insights</a>
+                </td>
+            </tr>
+        </table>
+
+        <hr/>      
         <div id="table"></div>      
     </div>         
 
@@ -280,8 +293,9 @@ $(document).ready(function(){
                 },
             td: {
                     'text-align': 'center',
-                    'background-color': 'lightgrey',
-                    'color': '#000',
+                    'background-color': '#F1F1F1',
+                    'color': 'black',
+                    'border-color':'#D4D4D4'
                 }
             },
     className:{
