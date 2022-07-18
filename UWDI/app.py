@@ -1,3 +1,4 @@
+import os
 import time
 from flask import Flask  
 from flask import render_template
@@ -11,8 +12,7 @@ import re
 
 app = Flask(__name__)
 
-
-client = pymongo.MongoClient("mongodb://prabmoha5:Msds123@ac-wv9ttbz-shard-00-00.o7xwskl.mongodb.net:27017,ac-wv9ttbz-shard-00-01.o7xwskl.mongodb.net:27017,ac-wv9ttbz-shard-00-02.o7xwskl.mongodb.net:27017/?ssl=true&replicaSet=atlas-z872my-shard-0&authSource=admin&retryWrites=true&w=majority")
+client = pymongo.MongoClient(os.environ.get('MONGODB_URI'))
 db = client.TestUsers ## DB Creation ##
 db_w = client.Weather_DB
 
