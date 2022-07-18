@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+ <head>
+   <meta charset="utf-8">   
+ </head>
+ <body>
+  <h1 style="text-align: center;font-family: -apple-system-subheadline">Dallas : Distribution of weather events from 2016 - 2021 </h1>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.26.0/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.js"></script>  
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+
+<p align="right"><button style="float: right;height: 30px;font-weight: bold;font-size: 12px;text-shadow: none; min-width: 100px; line-height: 13px; border-radius: 50px;"
+   type="button" class="btn btn-info"> <a href="../">Home</a></button></p>                               
+
+  
+  <div style="height: 350px;align-items:center">
+     <canvas id="myChart" width="10" height="10"></canvas>    
+  </div>
+  <p><br></p>
+  <div style="height:250px;align-items:center">    
+    <canvas id="myscatterChart" width="10" height="10"></canvas>
+ </div>
+ <div style="height:450px;align-items:center">    
+  <canvas id="mybarChart" width="10" height="10"></canvas>
+  </div>
+  <script>
+    const config = {
+    // The type of chart we want to create
+    type: 'doughnut', //types: bar, horizontalBar, pie, line, doughnut, radar, polarArea,scatter
+    // The data for our dataset
+    data: {    
+      labels: [{% for item in labels %} '{{item}}', {% endfor %}],   
+      datasets: [{ 
+      label:'Distributionaaaa of weather event types from 2016 - 2021 ',       
+      backgroundColor: ['rgb(255, 99, 132)','rgb(54, 162, 235)','rgb(255, 205, 86)','orange','violet','peach'],      
+      hoverOffset: 4,
+      data: [{% for item in values %} {{item}}, {% endfor %}],  
+      }]
+    },
+      options: {
+        maintainAspectRatio : false,
+      }
+    }; 
+//
+const barconfig ={
+  type: 'bar',
+   data: {
+      // labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'], 
+      labels: [{% for item in barlabels %} 
+                    '{{item}}',
+                {% endfor %}],
+       //labels: ['2016-01-27 15:30:05','2016-01-27 16:15:25','2016-01-27 17:15:25','2016-01-27 18:15:25','2016-01-27 19:15:25','2016-01-27 24:15:25'],
+      datasets: [{
+        label: 'Precipitation in inches from 2016 - 2021',
+          fill: true,
+          backgroundColor: "blue",
+          borderWidth: 2,
+          borderColor: "rgba(220,220,220,1)",
+          pointBorderColor: "rgba(220,220,220,1)",
+          pointBackgroundColor: "#fff",
+          pointBorderWidth: 1,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: "rgba(220,220,220,1)",
+          pointHoverBorderColor: "rgba(220,220,220,1)",
+          pointHoverBorderWidth: 2,
+           //data: [12, 19, 3, 5, 2, 3], // Data on Y axis
+        data:[{% for item in barvalues %} {{item}}, {% endfor %}],
+           //data:[0.21,  0.08],
+        //borderWidth: 1
+       }]
+   },
+   options: {
+        maintainAspectRatio : false
+      }
+};
+// scatter plot data - distributions of monthly events
+const scatterconfig = {
+  type: 'scatter',
+  data: {
+    datasets: [{
+    label: 'Monthly distribution of weather events',
+      data: [{% for item in scatterdata %} {x:{{item[0]}} ,y:{{item[1]}}}, {% endfor %}],              
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        borderColor: 'rgba(255,99,132,1)',
+        borderWidth: 1,           
+        pointRadius: 10,
+        fill: false,
+        pointHoverRadius: 25
+        }],
+    },
+    options: {
+      maintainAspectRatio : false,
+      scales: {
+            yAxes: [{
+              ticks: {
+              }
+            }],
+            xAxes: [{
+              ticks: {
+                maxTicksLimit: 7
+              }
+            }]
+          }
+      }       
+    };
+
+   
+const ctx = document.getElementById('myChart').getContext('2d');
+ctx.width = 10;
+ctx.height = 10;
+new Chart(ctx, config);
+
+const ctxscatter = document.getElementById('myscatterChart').getContext('2d');
+new Chart(ctxscatter, scatterconfig);
+
+const ctxbar = document.getElementById('mybarChart').getContext('2d');
+new Chart(ctxbar, barconfig);
+
+</script>
+</body>
+</html> 
