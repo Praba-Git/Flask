@@ -1,3 +1,4 @@
+import time
 from flask import Flask  
 from flask import render_template
 from flask_paginate import Pagination, get_page_args, get_page_parameter
@@ -6,6 +7,7 @@ from flask import (Flask, Response, jsonify, make_response, render_template,
 from datetime import datetime
 import pymongo
 import re
+
 
 app = Flask(__name__)
 
@@ -16,12 +18,19 @@ db_w = client.Weather_DB
 
 @app.route("/")
 def home():
-    return render_template("Gridjs.html")
+    page, per_page, offset = get_page_args(page_parameter='page',
+                                           per_page_parameter='per_page')    
+    pagination_w,total = get_weather_data(offset=offset, per_page=per_page)
+    pagination = Pagination(page=page, per_page=per_page, total=total,
+                            css_framework='bootstrap4')         
+    return render_template('home.html', weatherlist=pagination_w,
+                            page=page,
+                            per_page=per_page,
+                            pagination=pagination) 
 
-def get_users(offset=0, per_page=10):
-    users = list(db.Users.find({}, {"_id":0}))
-    return users[offset: offset + per_page]
 
+
+# Common functions
 def get_unique_eventid():    
     unique_id =int(db_w.TX_Dallas.find_one(sort=[("EventId",pymongo.DESCENDING)])['EventId']) + 1
     return unique_id
@@ -77,8 +86,8 @@ def update_weather():
         eventID = int(request.form['eventId'])
         type = request.form['type']
         severity = request.form['severity']
-        starttime = request.form['starttime']
-        endtime = request.form['endtime']
+        starttime = datetime.strptime(request.form['starttime'], "%a, %d %b %Y %H:%M:%S %Z") 
+        endtime = datetime.strptime(request.form['endtime'], "%a, %d %b %Y %H:%M:%S %Z") 
         airportcode = request.form['airportcode']
         lat = request.form['lat']
         lang = request.form['lang']
@@ -95,24 +104,6 @@ def update_weather():
 def ajax_GridJse(): 
     w_list = list(db_w.TX_Dallas.find({}, {"_id":0}))
     return  {'data': w_list}
-
-
-@app.route('/index/')
-def index():
-    userlist = db.Users.find({}, {"_id":0})
-    page, per_page, offset = get_page_args(page_parameter='page',
-                                           per_page_parameter='per_page')
-    total = len(list(userlist))
-    pagination_users = get_users(offset=offset, per_page=per_page)
-    pagination = Pagination(page=page, per_page=per_page, total=total,
-                            css_framework='bootstrap4') 
-        
-    # rowCount = len(list(userlist))
-    #userlist = get_users(offset=0, per_page=rowCount)
-    return render_template('index_ajax.html', userlist=pagination_users,
-                            page=page,
-                            per_page=per_page,
-                            pagination=pagination) 
 
 @app.route("/ajax_add",methods=["POST","GET"])
 def ajax_add():  
@@ -145,3 +136,62 @@ def ajax_delete():
         db_w.TX_Dallas.delete_one(myQuery) 
         msg = 'Record deleted successfully'  
     return jsonify(msg) 
+
+
+# Data-insights using Charts.js
+
+@app.route("/weather_chart")
+def weather_chart():
+    start = datetime(2016, 1,1)
+    end = datetime(2016, 1, 31)
+    legend = 'Dallas Precipitation in inches'    
+    #myDatetime = dateutil.parser.parse('2016-01-01T15:53:00.000+00:00')
+    #from_date = ('2016-01-31T15:53:00.000+00:00')   
+    chartlist = list(db_w.TX_Dallas.find({"StartTime(UTC)": {'$gt':start,'$lt':end},"Precipitation(in)":{'$gt':0.0}}))
+    percipitaionY= [i['Precipitation(in)'] for i in chartlist]
+    #eventDateX = [i['StartTime(UTC)'].strftime("%Y-%m-%d %H:%M:%S") for i in chartlist]
+    eventDateX = [i['StartTime(UTC)'] for i in chartlist]
+    # variables for populating a pie chart
+    pielabelslist = list(db_w.TX_Dallas.aggregate([{'$group':{'_id':"$Type",'count':{'$count':{}}}}]))
+    pielabelsX =  [i['_id'] for i in pielabelslist]
+    piedataY =  [i['count'] for i in pielabelslist]
+    # end 
+    
+    #print(len(percipitaionY))
+    return render_template('weather_chart_working_copy.html', values=piedataY, labels=pielabelsX, legend=legend)
+ 
+# weather event type distribution chart grouped by event type
+@app.route("/weather_piechart")
+def weather_piechart():
+    #legend = 'Dallas : Distribution of weather event types from 2016 - 2021 '           
+    # variables for populating a pie chart
+    datalist = list(db_w.TX_Dallas.aggregate([{'$group':{'_id':"$Type",'count':{'$count':{}}}}]))
+    pielabelsX =  [i['_id'] for i in datalist]
+    piedataY =  [i['count'] for i in datalist]
+    # end 
+   # return render_template('weather_piechart.html', values=piedataY, labels=pielabelsX, legend=legend)
+    return render_template('weather_piechart.html', values=piedataY, labels=pielabelsX)
+
+# route to display weather distribution data
+@app.route("/metrics")
+def weather_metrics():
+    legend = 'Dallas : Distribution of weather event  from 2016 - 2021 '           
+    # 1.  grouped and sorted by year - Pie -Chart  will display # of events in a year
+    datalist = list(db_w.TX_Dallas.aggregate([{'$group': {'_id': {'$year': "$StartTime(UTC)"}, 'count': { '$sum': 1 }}},{'$sort':{'_id':1}}]))
+    labelsX =  [i['_id'] for i in datalist]
+    dataY =  [i['count'] for i in datalist]
+    
+    # 2. grouped and sorted by month - scatter -Chart  will display # of events in a month   
+    datalistmonth = list(db_w.TX_Dallas.aggregate([{'$group': {'_id': {'$month': "$StartTime(UTC)"}, 'count': { '$sum': 1 }}},{'$sort':{'_id':1}}]))    
+    scatterdatamonth= [ [i['_id'],i['count']] for i in datalistmonth]  #scatter data (X,y)    
+
+    # 3. precipitation  distribution in a bar chart
+    start = datetime(2016, 1,1)
+    end = datetime(2021, 12, 31)
+    preciplist = list(db_w.TX_Dallas.find({"StartTime(UTC)": {'$gte':start,'$lte':end},"Precipitation(in)":{'$gt':0.0}}))
+    precipY= [i['Precipitation(in)'] for i in preciplist]    
+    precipYearX = [i['StartTime(UTC)'] for i in preciplist]    
+    
+    return render_template('weather_metrics.html', values=dataY, labels=labelsX, legend=legend,scatterdata=scatterdatamonth,barlabels=precipYearX,barvalues=precipY)
+    
+   
