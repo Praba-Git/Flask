@@ -74,9 +74,9 @@ def add_weather():
          #  msg = 'Please Input Office' 
         else:
           myquery = {"EventId": id , "Type": type,"Severity" : severity,"StartTime(UTC)":starttime,"EndTime(UTC)":endtime,"AirportCode":airportcode,"LocationLat":lat,"LocationLng":lang,"ZipCode":zipcode}                       
-          db_w.TX_Dallas.insert_one(myquery).inserted_id     
+          db_w.TX_Dallas.insert_one(myquery)  
           #msg = 'New record { } created successfully'.format(db_response )
-          msg = 'New weather event id '+ id + ' created successfully !'
+          msg = 'New weather event id '+ str(id) + ' created successfully !'
     return jsonify(msg)
 
 # update-weather record    
