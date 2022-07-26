@@ -2,9 +2,24 @@
 
 
 
-US Weather Data Insights (UWDI) is a web application that will provide
-historical weather events which can be used to derive valuable weather insights. The
-database application will use a Kaggle dataset capturing weather events covering 49
-states of the United States. The data is from January 2016 to December 2021, using
-historical weather reports that were collected from 2,071 airport-based weather
-stations across the nation.
+US Weather Data Insights (UWDI) is a database web application providing historical
+weather events for Dallas, TX that can be used to derive valuable weather insights. The application
+will use MongoDb database to store weather events captured from all 51 states in the
+United States.
+The web application is built based on the popular Model-View-Controller (MVC)
+architecture using Flask - a widely adopted Python framework, Bootstrap, AJAX, ChartJs
+and MongoDB.
+
+### Features:
+
+- CRUD operations
+- Sorting, Filtering and Pagination
+-  Data Visualization
+
+
+
+#### How to use it:
+
+- `git clone https://github.com/Praba-Git/Flask/tree/main/UWDI`
+- `pip install -r requirements.txt`
+- `python app.py` -> http://127.0.0.1:5000 
