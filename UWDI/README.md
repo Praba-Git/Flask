@@ -7,8 +7,7 @@ weather events for Dallas, TX that can be used to derive valuable weather insigh
 will use MongoDb database to store weather events captured from all 51 states in the
 United States.
 The web application is built based on the popular Model-View-Controller (MVC)
-architecture using Flask - a widely adopted Python framework, Bootstrap, AJAX, ChartJs
-and MongoDB.
+architecture using Flask - a widely adopted Python framework using Bootstrap templates to render Html content,Chart.js for data visualization and MongoDB for data storage.
 
 ### Features:
 
